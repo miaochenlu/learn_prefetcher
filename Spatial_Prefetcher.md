@@ -1,4 +1,4 @@
-# Spatial Pattern Prefetcher
+# Spatial Prefetcher
 
 # SPP (Signature Path Prefethcer)
 进行了一系列内存访问之后，接下来我可能访问哪些数据。
