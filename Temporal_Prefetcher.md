@@ -52,22 +52,31 @@ Other Storage elements next to each core
 Triggerring Events: cache misses & prefetch hits
 
 #### Recording
-<font color="#2DC26B">* Triggering</font>
+
+* <font color="#2DC26B">Triggering</font>
+
 Upon a triggering event, the address of the triggering event is appended to LogMiss. (LogMiss has the capacity of two cache blocks.)
-<font color="#2DC26B">* Updating HT</font>
+
+* <font color="#2DC26B">Updating HT</font>
+
 When one cache block worth of data is in LogMiss, Domino writes it to the end of the HT in the main memory and statistically updates the pointers of the written miss addresses in the EIT. (不是每一次都会更新EIT的)
-<font color="#2DC26B">* Updating EIT</font>
+
+* <font color="#2DC26B">Updating EIT</font>
+
 To update the EIT, for one out of every N triggering events (e.g., eight) written into the HT, the corresponding row of the EIT is fetched into FetchBuf. 
 If a super-entry for the triggering event is not found in the fetched row, a new super-entry is allocated with the LRU policy. 
+
 In the chosen super-entry, Domino attempts to find an entry for the address following the triggering event. If no match is found, a new entry is allocated with LRU policy. The pointer field of the entry is updated to point to the last row of the HT. 
 Finally, Domino updates the LRU stack of entries and super-entries. Once Domino is done with the row, it is written back to the EIT.
 
 #### Replaying (replay first, record second)
+
 When the next triggering event occurs (miss or prefetch hit), Domino searches the super-entry and picks the entry for which the address field matches the triggering event (might not be the most recent entry). 
 In case no match is found, the stred aam is discardend Domino uses the triggering event to bring another row from the EIT, and otherwise, Domino creates an active stream using the matched entry. It means that Domino sends a request to read the row of the HT pointed to by the pointer field of the matched entry to be brought into PointBuf. 
 Once the sequence of miss addresses from the row of the HT arrives, Domino issues prefetch requests to be appended to the Prefetch Buffer.
 
 **Find New Stream**:
+
 Domino prefetcher attempts to find a new stream and replaces the least-recently-used stream with it (which means discarding the contents of the prefetch buffer and PointBuf related to the replaced stream).
 To find a new stream, Domino uses the missed address to fetch a row of the EIT. 
 When the row is brought into PointBuf, Domino attempts to find the super-entry associated with the missed address. 
@@ -202,7 +211,9 @@ In particular, when a new PS mapping is written to off-chip storage, the mapping
 <img src="img\Pasted image 20230129235941.png">
 
 <img src="img\Pasted image 20230129235933.png">
+
 ### Comments
+
 * Fit Level: L2
 * Strength
 	* Tt dramatically reduces traffic by improving the utilization of ISB's metadata cache and by decoupling metadata cache management from the TLB
