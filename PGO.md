@@ -2,14 +2,16 @@
 
 ## A. Overall Process
 
-Step 1: Running & Profiling
-Step 2: Analysis. 
-	The profiling and tracing data as well as the unmodified binaries are then fed into a tool
-Step 3: Injection
+* Step 1: Running & Profiling
+
+* Step 2: Analysis. The profiling and tracing data as well as the unmodified binaries are then fed into a tool
+
+* Step 3: Injection
+
 <img src="img\Pasted image 20230223232525.png">
 
 ## B. Profiling & Tracing Tools
-| tools                               | --                  |
+| tools                               | usage                  |
 | ----------------------------------- | ------------------- |
 | VTune                               | instruction mix     |
 | PMU counters                        | instruction mix     |
@@ -18,6 +20,7 @@ Step 3: Injection
 | PT (processor trace)                | execution frequency |
 
 ## C. Representative work
+
 [Heiner Litz](https://people.ucsc.edu/~hlitz/)
 * [MICRO'22 Best Paper] Whisper: Profile-Guided <font color="#2DC26B">Branch Misprediction</font> Elimination for Data Center Applications
 * [ISCA'22] Thermometer: Profile-Guided <font color="#2DC26B">BTB Replacement</font> for Data Center Applications
@@ -33,14 +36,16 @@ Step 3: Injection
 ---
 
 # Classifying Memory Access Patterns
+
 This approach executes the target binracy once to obtain execution traces and miss profiles, performs dataflow analysis, and finally injects prefetches into a new binary.
 
 <img src="img\Pasted image 20230223133644.png">
-[[classify">
 
 ---
 ## Memory Access Pattern -- The Recurrence Relation
+
 $$A_n=f(A_{n-1})$$
+
 * $A$ is a memory address 
 * $n$ represents the nth execution of a particular load instruction 
 * $f (x)$ is an arbitrary function. The complexity of $f (x)$ determines the capabilities a prefetcher requires to predict and prefetch a certain future cache miss.
@@ -186,7 +191,7 @@ Rewrite the compiled assembly code adding the new instruction prefix to every cr
 
 ## Background
 
-hwpf无法检测complex pattern比如indirect mem access, s现有的sw prefetcher通过static信息可能可以有比较好的accuracy和coverage, 但是由于缺少dynamic execution info 比如execution time, 很难做到timely。这篇文章认为timely prefetch有两个重要的点：prefetch distance和prefetch injection site, 所以通过profile-guided的方法获取了一些dynamic info来指导timely prefetch 途径
+hwpf无法检测complex pattern比如indirect mem access, 现有的sw prefetcher通过static信息可能可以有比较好的accuracy和coverage, 但是由于缺少dynamic execution info 比如execution time, 很难做到timely。这篇文章认为timely prefetch有两个重要的点：prefetch distance和prefetch injection site, 所以通过profile-guided的方法获取了一些dynamic info来指导timely prefetch 途径
 
 <img src="img\Pasted image 20230223234223.png">
 
@@ -202,8 +207,11 @@ hwpf无法检测complex pattern比如indirect mem access, s现有的sw prefetche
 <img src="img\Pasted image 20230223234533.png">
 
 > 文章里面用到Intel CPU上的Last Branch Record (LBR) 如上图所示
+>
 > 每个LBR有一个PC，记录这里发生了一个taken branch；有一个Target, 记录跳转地址；有一个branch执行的时间。
+>
 > LBR是一个buffer, 其中存了last 32 basic blocks (BBL) executed by the CPU。
+>
 > BBL是两个taken branch之间连续执行的一段指令
 
 ## Step2: Analysis
@@ -217,21 +225,29 @@ Loop latency包含两部分的执行时间信息
 	* MC_latency取决于内存状态，会有很大变化
 
 IC_latency和MC_latency得到之后，可以通过如下公式计算prefetch_distance。在这个distance下，prefetch可以hide memory latency
+
 $$IC\_{latency}\times prefetch\_{distance}=MC\_{latency}$$
+
 接下来就是怎么去得到IC_latency和MC_latency
+
 ### A. 计算loop execution time & loop trip count
+
 * <font color="#2DC26B">loop execution time计算</font>：finding two instances of the same branch PC implementing a loop and subtracting their cycle counts, we can compute the execution time of a loop iteration
+
 * <font color="#2DC26B">loop trip count计算</font>：In the case of a nested loop, if we know the branch PC corresponding to the outer loop and the branch PC corresponding to the inner loop, we can count the number of inner branch PCs within two outer branch PCs in the LBR to compute the number of inner loop iterations.
 
 <img src="img\Pasted image 20230223235046.png">
 
 ### B. Determining the Optimal Prefetch Distance
+
 得到loop execution time之后还是得不到IC_latency, MC_latency
 为此，这篇文章做了<font color="#2DC26B">loop execution time</font>的latency distribution
+
 * for all LBR samples that contain at least two instances of the BBL containing the delinquent load, measure the loop execution time by subtracting the cycle counts of the two subsequent branches
 * analyze the latency distribution of the loop's execution time to predict the latency in the case that the load is served from the L1 or L2 cache
     
 <img src="img\Pasted image 20230223235205.png">
+
 这个一个distribution图，显示了4个峰：80, 230, 400, 650 cycles; 对应了serve from L1, L2, LLC, DRAM
 计算可得IC_latency=80 cycles, MC_latency=650-IC_latency=570 cycles
 最后prefetch_distance=570/80~7
