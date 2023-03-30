@@ -42,6 +42,7 @@ prefetcher找到history table中的位置，然后开始为后续地址发起pre
 * History Table (HT): a circular FIFO buffer --> in DRAM
 * Enhanced Index Table (EIT): set-associative structure, stores a pointer for every observed miss addr to its last occurrence in the History Table --> in DRAM
 <img src="img\Pasted image 20230222102505.png">
+
 Other Storage elements next to each core
 * a buffer to record the sequence of triggering events named **LogMiss** （存放两个miss entry)
 * a buffer to keep the prefetched cache blocks named **Prefetch Buffer**
