@@ -251,6 +251,7 @@ break;
 > The sum denotes the confidence value for the suggested prefetch, and is thresholded against two different values: $\tau_{hi}$ and $\tau_{lo}$
 > 
 > $sum>\tau_{hi}$ -> prefetch into L2
+>
 > $\tau_{lo}<=sum<=\tau_{hi}$ -> prefetch into LLC
 
 在`read_pattern`中计算出sum, 并且确定prefetch level，放入prefetch queue

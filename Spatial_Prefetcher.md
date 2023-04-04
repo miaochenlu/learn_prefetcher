@@ -74,8 +74,11 @@ Prefetch Filter是一个direct-mapped filter, 记录当前prefetched cache lines
 SPP在issue prefetch之前会先检查PF。如果PF中存在某个cache line, 那么说明这个line早就被预取了，SPP会丢弃这个redundant prefetch request。
 
 > 在PF中为每个entry增加useful是为了SPP计算accuracy
+>
 > SPP会记录两个global counter: $C_{total}$ 记录prefetch request的总数，$C_{useful}$ 记录 useful prefetch的数量。
+>
 > $C_{total}$ 在SPP issue一个没有被filter的prefetch request的时候会+1
+>
 > $C_{useful}$ 在L2 demand requests hit PF的时候会+1。在PF中增加useful bit是为了防止同一个cache line加多次。
 
 <img src="img\Pasted image 20230324173328.png">
@@ -107,6 +110,7 @@ SPP在issue prefetch之前会先检查PF。如果PF中存在某个cache line, �
 对于suggested prefetch request, 先通过perceptron中各种feature的weight计算出sum。将sum和两个threshold作比较： $\tau_{hi}$ and $\tau_{lo}$
 
 > $sum>\tau_{hi}$ -> prefetch into L2
+>
 > $\tau_{lo}<=sum<=\tau_{hi}$ -> prefetch into LLC
 
 <img src="img\Pasted image 20230404112020.png">
@@ -127,14 +131,21 @@ Demand request来的时候，访问prefetch table更新权重，访问reject tab
 [[to improve!]]
 
 性能表现
- * 在75个不同的工作负载中，仅使用3.6KB的存储空间，DSPatch相对于一个PC-based stride prefetcher在L1缓存和SPP在L2缓存的激进基线提高了6%的性能（在内存密集型工作负载中提高了9%，最高可达26%）。 
+
+ * 在75个不同的工作负载中，仅使用3.6KB的存储空间，DSPatch相对于一个PC-based stride prefetcher在L1缓存和SPP在L2缓存的激进基线提高了6%的性能（在内存密集型工作负载中提高了9%，最高可达26%）。
+
  * 作为一个独立的预取器，DSPatch的性能略高于最先进的SPP(1%左右)，且仅需SPP存储要求的2/3。 
+ 
  * SPP和DSPatch的使用结合了最先进的delta-based prefetching和bit-pattern-based prefetching的优点。通过同时优化覆盖率和准确性，DSPatch每增加2%的覆盖率只会增加1%的错误预测。最后，DSPatch+SPP的性能随着内存带宽的增加而扩展得很好，从SPP上升6%到DRAM带宽翻倍时上升10%
+
 ## A. background
+
 ### i. Address access patterns 
+
 * full addresses
 * offset in a spatial region (typically a 4KB page)
 * address deltas between consecutive accesses
+
 ### ii. Prefetcher Comparison
 #### SPP: delta-based prefetcher 
 
@@ -143,6 +154,7 @@ SPP uses a recursive look-ahead mechanism to boost prefetch distance and timelin
 disadvantages: In pages with sparse and highly irregular access patterns,SPP cannot track all possible deltas, losing out on coverage. Thedeltas it tracks have low confidence values, limiting the recursiveprefetch distance and hence timeliness.
 
 ### BOP: delta-based prefetcher
+
 Best Offset Prefetcher是一种硬件预取器，它可以动态地选择最佳的预取偏移量，从而提高缓存的命中率和性能。根据我从网络上搜索到的信息，Best Offset Prefetcher的工作原理如下：
 
 - Best Offset Prefetcher在每次缓存未命中或预取命中时，都会生成一个预取请求，并将其发送到下一级缓存。预取地址是通过在访问地址上加上一个偏移量得到的。

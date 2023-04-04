@@ -7,5 +7,6 @@
 
 ## Prefetcher代码阅读
 * [SPP code](SPP_code.md)
+* [SPP + PPF code](SPP_PPF_code.md)
 * [DSPatch code](DSPatch_code.md)
 * [Stream Prefetcher code](Stream_code.md)
