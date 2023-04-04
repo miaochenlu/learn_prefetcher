@@ -83,11 +83,44 @@ SPP在issue prefetch之前会先检查PF。如果PF中存在某个cache line, �
 
 # SPP + PPF
 
-[[todo!]]
+目的：SPP目前的confidence-based throttling机制很复杂。accuracy和coverage是两个此消彼长的因素，很难调节。PPF可以让SPP激进的发送请求，并且将其的一些无用的request过滤掉，达到兼顾coverage和accuracy的效果
 
-[PPF\_Design.svg](https://raw.githubusercontent.com/elbrandt/CS752_Proj/546a5d0602211fcf8b93492e3cabf61dce6194c0/reports/final/PPF_Design.svg)
+## Structure 
 
-[H11-Make Prefetch Great Again / Improve Data Prefetching: Perceptron-based Filter in gem5 on Vimeo](https://vimeo.com/543692181)
+### a. Perceptron
+
+<img src="img\Pasted image 20230404164941.png">
+
+对于一个有N个feature的PPF来说，他包含
+* N个table（存储权重）
+	* table里面的每个entry代表一个权重。权哥entry是一个5位的饱和计数器
+
+### b. Prefetch Table & Reject Table
+这两个Table中Prefetch Table记录了prefetch request的信息，Reject Table记录了不应该被prefetch的信息，这两个table被用来train perceptron
+
+结构上，他们都是直接映射的结构，有1024个entry, 用addr的10位地址索引，6位做tag比较，entry中存储了各种feature相关的信息
+
+<img src="img\Pasted image 20230404164953.png">
+
+## Process 
+### i. Interfencing
+对于suggested prefetch request, 先通过perceptron中各种feature的weight计算出sum。将sum和两个threshold作比较： $\tau_{hi}$ and $\tau_{lo}$
+
+> $sum>\tau_{hi}$ -> prefetch into L2
+> $\tau_{lo}<=sum<=\tau_{hi}$ -> prefetch into LLC
+
+<img src="img\Pasted image 20230404112020.png">
+
+### ii. Recording
+
+过程中将认为应该issue到L2的prefetch的加入prefetch table, 将其他的request加入reject table 
+
+### iii. Training
+
+主要在两个时间点进行PPF training, 一个是demand request来的时候，另一个是cache eviction的时候。
+
+Demand request来的时候，访问prefetch table更新权重，访问reject table更新权重 
+同样cache eviction的时候，也做权重的更新
 
 # DSPatch 
 
