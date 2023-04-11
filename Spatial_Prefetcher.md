@@ -265,3 +265,167 @@ PopCount of the bitwise AND operation between the program bit-pattern and the pr
 
 
 <img src="img\Pasted image 20230320144503.png">
+
+# IPCP Prefetcher 
+[https://dpc3.compas.cs.stonybrook.edu/slides/bouquet.pdf](https://dpc3.compas.cs.stonybrook.edu/slides/bouquet.pdf)
+
+## i. 四类prefetcher
+
+### 1. Constant Stride (CS): only control flow
+#### a. 目标
+
+预取如下呈现的constant stride pattern
+
+<img src="img\Pasted image 20230410162234.png">
+
+#### b. components 
+
+下图是constant stride (CS)下IP table的内容
+
+<img src="img\Pasted image 20230410164218.png">
+
+* 由IP来index和tag
+* stride是用来记录constant stride的
+* confidence来记录当前stride的置信程度。如果遇到了相同的stride, confidence增加，反之减小
+* last_vpage存储了上一次访问 的virtual page的2个低位，用来检测page的变化。
+* last_line_offset存储了上一次访问的cache line相对于page的offset 
+	* last_vpage以及last_line_offset二者一起决定了stride的计算结果。比如last page是1，last_line_offset是63，当前page是2，line offset是0，那么当前stride就是(0-63)+64(2-1)=1
+#### c. process 
+* Training phase
+	* IP会持续training直到confidence达到某个threshold
+* Thained phase
+	* IP获得足够的confidence后进入trained状态
+	* 发起perfetch请求
+		* prefetch addr = (cur cacheline addr) + k * (learned stride), 其中k取1到prefetch degree的值
+	* confidence低于threshold进入training状态
+### 2. Complex Stride (CPLX): control flow coupled with data flow
+#### a. 目标
+在stride不断变化的情况下取得比较好的预取效果
+
+<img src="img\Pasted image 20230410163823.png">
+
+#### b. components 
+<img src="img\Pasted image 20230410164206.png">
+
+* IP table 
+	* 同上的IP table, 加入一个n位的signature, 记录前n个stride hash之后的结果
+* CSPT
+	* 由signature索引
+	* stride是预测的当前的signature下，下一次访问的stride是多少
+	* confidence代表这个预测的stride的置信程度
+#### c. Process 
+* Training phase 
+	* IP对应的signature索引到CSPT
+	* 如果CSPT中的stride和当前stride一样，则增加confidence, 反之减少
+	* 更新IP table中的signature
+* Trained phase 
+	* 用上述更新过的signature再去访问CSPT，如果对应的stride confidence足够高，则发送预取请求
+	* 在prefetch degree下，通过1,2,3步不断发射预取  
+#### d. CPLX与SPP的区别
+* 关注的点不一样
+	* SPP关注某一page的访问
+	* CPLX是关注某一IP
+* access pattern不一样，以下几种情况CPLX会好一点
+	* The memory accesses (for a given IP) are sometimes not in the powers of two (memory layout in data structures across cache lines), causing an nonconstant stride pattern.
+		* 例子是consider a cache line of 8 bytes, and if every 12th byte is accessed, the accesses create strides as follows: byte addresses: 0, 12, 36, 48, 72; cache line aligned addresses: 0, 1, 3, 4, 6; strides: 1, 2, 1, 2
+	* 对于多重循环的访问
+		* An outer loop could make constant stride accesses (can be easily captured by the CS class). 
+		* However, an inner loop could make different stride accesses (depending on the strides of the outer loop), thus causing bumps in the stride pattern. An IP based CPLX can exploit this pattern.
+* global & local 
+	* SPP关注的是global pattern 
+	* CPLX关注的是local pattern
+### 3. Global stream (GS): control flow predicted data flow
+#### a. 目标
+
+#### b. components 
+<img src="img\Pasted image 20230410203651.png">
+
+* IP table 
+	* IP tag与索引
+	* stream-valid
+	* direction
+* Region Stream Table(RST)
+	* 记录每个region以及他们的访问，一个region大小为2KB
+	* 32-bit bit-vector: 记录该region中32个cache line的访问情况。如果该region中的某个cacheline被第一次访问，对应的bit会置1，同时dense counter加1
+	* dense counter:记录不同的cache line的访问次数。当dense-count超过了75%，表示这个region已经训练完成
+	* last line offset: 记录region中最后一次访问的offset
+#### c. Process 
+* Training Process 
+	* 如果一个新的region被访问，则在RST中分配一个新的entry。如果该region中的某个cacheline被第一次访问，对应的bit会置1，同时dense counter加1（不是第一次访问的话不会增加）。 
+	* 如果dense counter超过75%，则所有访问该region的IP成为GS IP。trained bit被置1
+	* RST使用n-bit饱和计数器来决定stream的direction (pos / neg count)。这个计数器被初始化为$2^n/2$。通过找到两个连续访问之间的差值计数（last-line-offset起作用），如果是正的插值，则加1，负的插值则减1
+	* 如果GS IP到了一个新的region，则通过last-vpage和last-line-offset看他之前访问的region。如果之前访问的region是dense的(trained bit set), 那么将新region的RST entry的tentative bit置1。
+* Trained Process
+	* demand access来的时候，检查RST entry的trained bit和tentative bit, 如果有一个set了，说明这个IP属于GS IP
+	* Set IP table中的stream-valid和direction
+	* GS IP根据trained direction prefetch接下来的prefetch degree个cache line
+### 4. Next line 
+如果CS, CPLX, GS不是的话，则启用NL prefetcher。当MPKI太高的时候，不要开启NL Prefetcher
+
+## ii. IPCP整体架构
+### 1. IPCP at L1
+<img src="img\Pasted image 20230410210908.png">
+
+#### a. Components 
+* IP Table 
+	* Shared: IP-tag, Valid, last-vpage, last-line-offset
+	* for CS: 
+		* Stride 
+		* Confidence 
+	* for CPLX:
+		* Signature 
+	* for GS:
+		* Stream valid 
+		* direction
+* RST 
+* CSPT
+
+关于IP table的替换问题：
+
+When an IP is encountered for the first time, it is recorded in the IP table and the valid bit is set. 
+
+When another IP maps to the same entry, the valid bit is reset, but the previous entry remains active. 
+
+If the valid bit is reset when a new IP is seen then the table entry is allocated to the new IP and the valid bit is set again, ensuring that at least one of the two competing IPs is tracked in the IP table.
+
+#### b. Process 
+
+1. IP table hit, 则IPCP同时检查CS/CPLX/GS。同一时间，IP可能不属于任意一个class, 或者属于多个class。同时，检查RST并且训练
+2. IPCP看IP属于CS还是GS。如果都属于，那么IPCP会优先选择GS
+3. IPCP不属于CS和GS，看是否属于CPLX。 
+4. 如果CPLX的confidence不高，则根据MPKI选择NL Prefetcher
+
+整体上，优先级为
+
+$$GS>CS>CPLX>NL$$
+
+#### c. 一些设计问题
+* Prefetch Degree 
+	* GS: 6
+	* CS & CPLX: 3
+* Filter 
+	* Use a small recent-request filter (RR filter, 32 entry) to track recently seen tags.
+
+### 2. IPCP at L2
+
+<img src="img\Pasted image 20230411095539.png">
+
+IPCP at L2没有CPLX, 因为测出来没啥用
+#### a. components
+* IP table 
+	* IP tag, IP valid bit 
+	* 2-bit class type 
+	* 7-bit stride/direction
+#### b. Process 
+* Metadata Decoding
+use the L1 prefetch requests to communicate the IP classification information to the L2 prefetcher by transmitting lightweight metadata along with the prefetch requests.
+
+!<img src="img\Pasted image 20230411100255.png">
+
+* Prefetch 
+	* L2 demand access, 访问L2 IP table
+
+#### c. 一些设计问题
+* Prefetch Degree 
+	* GS: 4
+	* CS: 4
