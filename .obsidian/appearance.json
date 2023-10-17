@@ -1,0 +1,10 @@
+{
+  "accentColor": "#8fd6aa",
+  "theme": "moonstone",
+  "cssTheme": "Blue Topaz",
+  "nativeMenus": false,
+  "baseFontSize": 17,
+  "enabledCssSnippets": [
+    "img-grid"
+  ]
+}
