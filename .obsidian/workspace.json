@@ -8,77 +8,19 @@
         "type": "tabs",
         "children": [
           {
-            "id": "f3d3c33c022febd3",
+            "id": "a89fcdb5bd5aff26",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Spatial_Prefetcher.md",
+                "file": "Readme.md",
                 "mode": "source",
                 "source": false
               }
             }
           },
           {
-            "id": "cd7f23dcea8c34f3",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "BOP_Analysis.md",
-                "mode": "source",
-                "source": false
-              }
-            }
-          },
-          {
-            "id": "35611fd012edc7f2",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "simulator_codes/Gem5中的Prefetcher基类.md",
-                "mode": "source",
-                "source": false
-              }
-            }
-          },
-          {
-            "id": "77f7e2c170a39fe3",
-            "type": "leaf",
-            "state": {
-              "type": "release-notes",
-              "state": {
-                "currentVersion": "1.4.14"
-              }
-            }
-          },
-          {
-            "id": "5a88a063a33439ea",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "Prefetcher统计数据.md",
-                "mode": "source",
-                "source": false
-              }
-            }
-          },
-          {
-            "id": "4f1a220f5084495c",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "BOSC_Prefetcher.md",
-                "mode": "source",
-                "source": false
-              }
-            }
-          },
-          {
-            "id": "ec4e6aa07c6ef43a",
+            "id": "4edc2bef1b147dc5",
             "type": "leaf",
             "state": {
               "type": "markdown",
@@ -90,41 +32,30 @@
             }
           },
           {
-            "id": "1752eb5d3b010257",
-            "type": "leaf",
-            "state": {
-              "type": "image",
-              "state": {
-                "file": "attachments/Pasted image 20230128154912.png"
-              }
-            }
-          },
-          {
-            "id": "a89fcdb5bd5aff26",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "Cross Page.md",
-                "mode": "source",
-                "source": false
-              }
-            }
-          },
-          {
             "id": "998f6eac2416f6b4",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "rtl_codes/Prefetcher_Interface.md",
+                "file": "Software_Prefetcher.md",
+                "mode": "source",
+                "source": false
+              }
+            }
+          },
+          {
+            "id": "b703018ea6d1b03a",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "paper_list.md",
                 "mode": "source",
                 "source": false
               }
             }
           }
-        ],
-        "currentTab": 3
+        ]
       }
     ],
     "direction": "vertical"
@@ -190,6 +121,7 @@
             "state": {
               "type": "backlink",
               "state": {
+                "file": "Readme.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -206,6 +138,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
+                "file": "Readme.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -227,7 +160,9 @@
             "type": "leaf",
             "state": {
               "type": "outline",
-              "state": {}
+              "state": {
+                "file": "Readme.md"
+              }
             }
           },
           {
@@ -268,11 +203,19 @@
       "obsidian-excalidraw-plugin:新建 Excalidraw 绘图": false
     }
   },
-  "active": "77f7e2c170a39fe3",
+  "active": "a89fcdb5bd5aff26",
   "lastOpenFiles": [
+    "Temporal_Prefetcher.md",
+    "Software_Prefetcher.md",
+    "paper_list.md",
+    "Readme.md",
+    "conclusions.md",
+    "Stride_Prefetcher.md",
+    "Some Conclusions.md",
+    "attachments/Pasted image 20230128154912.png",
+    "Spatial_Prefetcher.md",
     "未命名 2.md",
     "未命名 1.md",
-    "未命名.md",
     "simulator_codes/Gem5中的Prefetcher基类.md",
     "simulator_codes/ISB_Gem5_Code.md",
     "simulator_codes/SPPPPF_ChampSim_Codes.md",
@@ -280,33 +223,25 @@
     "simulator_codes/Stride_Prefetcher_Gem5_Codes.md",
     "BOP Analysis -- Correct.md",
     "Prefetcher统计数据.md",
-    "paper_list.md",
     "Misc.md",
     "Cross Page.md",
     "BOP_Analysis 1.md",
     "BOSC_Prefetcher.md",
     "cache_latency.md",
     "SUMMARY.md",
-    "Temporal_Prefetcher.md",
-    "Readme.md",
     "rtl_codes/Prefetcher_Interface.md",
-    "attachments/Pasted image 20230128154912.png",
     "BOP_Analysis.md",
     "attachments/Pasted image 20230820202046.png",
     "attachments/Pasted image 20230820201903.png",
     "attachments/Pasted image 20230819194804.png",
     "attachments/Pasted image 20230818203355.png",
-    "Spatial_Prefetcher.md",
     "attachments/Pasted image 20230818110214.png",
     "attachments/Pasted image 20230818110208.png",
     "attachments/Pasted image 20230818110200.png",
     "attachments/Pasted image 20230818110155.png",
     "attachments/Pasted image 20230818110139.png",
     "simulator_codes/MLOP_ChampSim_Codes.md",
-    "simulator_codes/BOP_Gem5_Codes.md",
     "attachments/~$bop_offset_test.tmp",
-    "Software_Prefetcher.md",
-    "Stride_Prefetcher.md",
     "attachments/bop_offset_test.xlsx",
     "�",
     "attachments/~$Spatial_PF_Perf.tmp",
