@@ -1,4 +1,3 @@
-# Thoughts
 
 * 在coverage/accuracy/timeliness这几个指标中，最重要的是timeliness
 * BOP因为及时性好，所以性能表现很好。而且开销很小。
@@ -17,43 +16,4 @@
 * Stream
 	* IPCP的GS认为访问了active region的PC都是active PC, active PC所到之处都会发一个region的prefetch请求。这种Stream在SPEC FP上表现很好，但是在INT上有好有差，因为PC不一定遵循一个pattern。
 	* 同样Stream要非常注意prefetch distance来满足及时性的要求，比如L1可以prefetch当前region 32个cacheline后的数据
-
-## Some Designs
-* ARM Neoverse V2
-![](attachments/Pasted%20image%2020231106220342.png)
-
-* Intel
-	* Stride+Stream+SPP-alike prefetcher+Array of pointer prefetcher+LLC page prefetcher (Maybe)
-# Content Overview
-
-# Paper Reading
-
-<center><img src="attachments/pf_paper.png" width="600"></center>
-
-* [Stride Prefetcher](Stride_Prefetcher.md)
-* [Spatial Prefetcher](Spatial_Prefetcher.md)
-* [Temporal Prefetcher](Temporal_Prefetcher.md)
-* [Software Prefetcher](Software_Prefetcher.md)
-
-# Code Reading 
-
-* [Stride Prefetcher Gem5 Codes](simulator_codes/Stride_Prefetcher_Gem5_Codes.md)
-* [Stream Prefetcher Gem5 Codes](simulator_codes/Stream_Prefetcher_Gem5_Codes.md)
-* [AMPM Gem5 Codes](simulator_codes/AMPM_Gem5_Codes.md)
-* [BOP Gem5 Codes](simulator_codes/BOP_Gem5_Codes.md)
-* [MLOP ChampSim Codes](simulator_codes/MLOP_ChampSim_Codes.md)
-* [SPP Gem5 Codes](simulator_codes/SPP_Gem5_Codes.md)
-* [SPP + PPF ChampSim Codes](simulator_codes/SPPPPF_ChampSim_Codes.md)
-* [DSPatch ChampSim Codes](simulator_codes/DSPatch_ChampSim_Codes.md)
-* [IPCP ChampSim Codes](simulator_codes/IPCP_ChampSim_Codes.md)
-* [ISB Gem5 Code](simulator_codes/ISB_Gem5_Code.md)
-
-# Prefetcher Papers
-
-* [Prefetcher Papers](paper_list.md)
-
-# Resources
-
-* [hwd-prefetch-study/Paper\_Reading.md](https://github.com/lshpku/hwd-prefetch-study/blob/3c0a6fb44029e04c7aa0ef2aaf80c152736b3a4f/Paper_Reading.md)
-
 
