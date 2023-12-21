@@ -9,7 +9,7 @@
 * SPP有点难评
 	* 一个调节的方法是根据及时性去改动lookahead threshold。如果及时性差，就调低threshold, 让SPP一直去lookahead，以便取到比较及时的数据。
 	* SPP的缺点是受乱序影响比较大，因为要根据signature去获取stride, 但是signature的计算是受访问顺序影响的。
-	* SPP如果不断lookahead而达到及时的话，会出问题，因为lookahead一次是需要几个cycle的，导致每次lookahead的距离是有限的。。如果能够记录一些history, 调过前面的lookahead过程可能会对问题有所缓解。（注意Gem5并没有模拟lookahead的latency，这可以去手动加入）
+	* SPP如果不断lookahead而达到及时的话，会出问题，因为lookahead一次是需要几个cycle的，导致lookahead的距离是有限的。如果能够记录一些history, 调过前面的lookahead过程可能会对问题有所缓解。（注意Gem5并没有模拟lookahead的latency，这可以去手动加入）
 * SMS预取irregular pattern还是不错的
 	* 个人认为SMS和SPP其实是一类的，都是针对irregular pattern。SMS的好处是不受乱序影响
 	* 同样，SMS没有及时性的调节方式。
