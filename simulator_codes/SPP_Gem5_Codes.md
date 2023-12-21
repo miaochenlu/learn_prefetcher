@@ -293,7 +293,6 @@ SignaturePath::updatePatternTable(Addr signature, stride_t stride)
 首先要找到PT entry
 
 ```cpp
-```cpp
 SignaturePath::PatternEntry &
 SignaturePath::getPatternEntry(Addr signature) {
     PatternEntry* pattern_entry = patternTable.findEntry(signature, false);
