@@ -26,6 +26,10 @@
 
 * [Reducing Load Latency with Cache Level Prediction](https://arxiv.org/pdf/2103.14808.pdf)
 
+## ICCD 2022
+
+* [Composite Instruction Prefetching](https://doi.org/10.1109/ICCD56317.2022.00076)
+
 ---
 
 # 2021
